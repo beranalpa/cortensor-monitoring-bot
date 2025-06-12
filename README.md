@@ -1,10 +1,19 @@
-# 🤖 Cortensor Monitoring Bot
+<div align="center">
 
+  <img src="https://avatars.githubusercontent.com/u/174224856?s=200&v=4" alt="Project Banner">
+<h1>Cortensor Monitoring Bot</h1>
+
+<p>
 A sophisticated and feature-rich Telegram bot for comprehensive monitoring and real-time alerting of Cortensor nodes.
+</p>
+ <p>
+    <a href="https://github.com/your-username/cortensor-watcher-bot/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"></a>
+    <a href="#"><img src="https://img.shields.io/badge/status-active-success.svg" alt="Status"></a>
+    <a href="#"><img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python Version"></a>
+    <a href="#"><img src="https://img.shields.io/badge/docker-%230db7ed.svg?logo=docker&logoColor=white" alt="Docker"></a>
+  </p>
 
-![Python](https://img.shields.io/badge/python-3.9+-blue.svg)
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![aiogram](https://img.shields.io/badge/library-aiogram-green.svg)
+</div>
 
 ---
 
