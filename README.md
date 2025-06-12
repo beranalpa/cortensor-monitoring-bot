@@ -1,31 +1,78 @@
 # 🤖 Cortensor Monitoring Bot
 
-A powerful Telegram bot designed to provide comprehensive monitoring and alerting for Cortensor nodes. Keep track of your node's health, statistics, and transaction status with on-demand reports and proactive, real-time alerts.
+A sophisticated and feature-rich Telegram bot for comprehensive monitoring and real-time alerting of Cortensor nodes.
+
+![Python](https://img.shields.io/badge/python-3.9+-blue.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![aiogram](https://img.shields.io/badge/library-aiogram-green.svg)
+
+---
+
+## 📄 Table of Contents
+
+- [About The Project](#-about-the-project)
+- [✨ Key Features](#-key-features)
+- [📸 Screenshots](#-screenshots)
+- [🚀 Getting Started](#-getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [🤖 Command Guide](#-command-guide)
+- [⚙️ How It Works](#️-how-it-works)
+- [📜 License](#-license)
+
+## 📖 About The Project
+
+**Cortensor Monitoring Bot** is more than just a simple monitoring tool. It's a proactive assistant designed to give node operators peace of mind. It provides detailed, on-demand reports, live-updating dashboards directly in your chat, and a near real-time alerting system for critical events like failed transactions.
+
+With a persistent database and intelligent background tasks, this bot ensures you are always informed about your node's performance and health.
 
 ## ✨ Key Features
 
--   **Comprehensive Node Statistics:** Get detailed reports on points, success rates, and performance trends over 1-hour and 24-hour periods.
--   **Real-Time Health Checks:** Instantly check your node's operational status, latest transaction, and balance.
--   **Live-Updating Reports:** Start an auto-updating message in your chat that provides a live look at your node's stats.
--   **Automatic Failed Transaction Alerts:** Receive proactive, near real-time notifications the moment one of your nodes has a failed transaction.
--   **Multi-Node Management:** Register and manage multiple nodes seamlessly from a single Telegram chat.
+-   **Comprehensive Monitoring:** A single `/stats` command provides a unified report with points, success rates, balance, health status, and more.
+-   **Historical Performance Tracking:** Automatically tracks and displays node performance changes over **15-minute, 1-hour, and 24-hour** intervals.
+-   **Dynamic Health Bar:** A visual health bar dynamically represents the success/failure of all transactions within the last 30 minutes.
+-   **Near Real-Time Alerts:** A background job runs every minute to check for recently failed transactions and sends an immediate, detailed notification if one is found.
+-   **User Control:** Users can enable or disable automatic alerts at any time using the `/auto` and `/off` commands.
+-   **Live Reports:** The `/autoupdate` command creates a "live" report card in your chat that continuously edits itself with the latest data.
+-   **Smart Cleanup:** The bot automatically cleans up old report messages when you request new ones, keeping your chat tidy.
+-   **Multi-Node Management:** Easily register, unregister, and list multiple nodes to monitor from a single account.
 
-## 🛠️ Setup & Installation
+## 📸 Screenshots
 
-To get the bot running, follow these steps:
+#### Comprehensive Stats Report
+This report combines all vital statistics, health information, and performance trends into a single, easy-to-read card.
+*(Your screenshot of the `/stats` output goes here)*
+
+#### Proactive Failed Transaction Alert
+Receive immediate, detailed alerts when something goes wrong.
+*(Your screenshot of the automatic alert message goes here)*
+
+## 🚀 Getting Started
+
+Follow these steps to get your own instance of the bot running.
+
+### Prerequisites
+
+-   Python 3.9 or higher
+-   A Telegram Bot Token obtained from [@BotFather](https://t.me/BotFather)
+-   An Arbiscan API Key
+
+### Installation
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/beranalpa/cortensor-monitoring-bot.git
+    git clone [https://github.com/beranalpa/cortensor-monitoring-bot.git](https://github.com/beranalpa/cortensor-monitoring-bot.git)
     cd cortensor-monitoring-bot
     ```
 
 2.  **Install dependencies:**
-    Make sure you have Python 3.8+ installed.
+    It's recommended to use a virtual environment.
     ```bash
+    python3 -m venv venv
+    source venv/bin/activate
     pip install -r requirements.txt
     ```
-    *(If you don't have a `requirements.txt` file, install the necessary libraries manually)*:
+    *(If a `requirements.txt` file is not available, install manually)*:
     ```bash
     pip install aiogram apscheduler aiohttp python-dotenv
     ```
@@ -41,75 +88,33 @@ To get the bot running, follow these steps:
     ```bash
     python3 main.py
     ```
+    The bot will start, initialize the databases, and schedule the background jobs.
 
-## 🤖 Commands Guide
+## 🤖 Command Guide
 
-Here is a complete list of all available commands.
+The following table provides a quick reference for all available commands.
 
-### **1. Getting Started**
+| Command | Arguments | Description |
+| :--- | :--- | :--- |
+| **`/start`**, **`/help`** | *(none)* | Displays the main help message. |
+| **`/register`** | `<address> <name>` | Registers a new node with a custom name. |
+| **`/unregister`** | `<address>` | Removes a registered node from your list. |
+| **`/list`** | *(none)* | Shows all nodes you are currently monitoring. |
+| **`/stats`** | `[address]` | Generates a comprehensive report for your node(s). |
+| **`/health`** | `[address]` | Provides a concise, real-time health check. |
+| **`/autoupdate`** | `<seconds>` | Starts a live-updating report in your chat. |
+| **`/stop`** | *(none)* | Stops and cleans up the live-updating report. |
+| **`/auto`** | *(none)* | **Enables** automatic failed transaction alerts. |
+| **`/off`** | *(none)* | **Disables** automatic failed transaction alerts. |
 
-These commands help you get started and view the command list.
+## ⚙️ How It Works
 
-**`/start`** or **`/help`**
--   **Function:** Displays the full list of available commands and their descriptions.
--   **Usage:** Simply send `/start` or `/help`.
+The bot utilizes a powerful scheduler (`APScheduler`) to run two key background tasks independently of user commands:
 
-### **2. Managing Your Nodes**
+1.  **Historical Data Logger:** Every **15 minutes**, the bot fetches the entire Cortensor leaderboard, aggregates the data for every miner, and saves a snapshot into a local SQLite database (`history.db`). This data is crucial for calculating the performance trends shown in the `/stats` report.
 
-Use these commands to add or remove the node addresses you want to monitor.
+2.  **Failed Transaction Alerter:** Every **1 minute**, the bot checks the most recent transactions for all registered nodes (for users who have alerts enabled). It specifically looks for transactions that have failed within the last 5 minutes and have not been alerted before, ensuring timely and relevant notifications.
 
-**`/register`**
--   **Function:** Registers a new node address for monitoring and assigns it a custom, easy-to-remember name.
--   **Usage:** `/register <your_address> <your_custom_name>`
--   **Example:** `/register 0x123abcde...fghij Node 1`
+## 📜 License
 
-**`/unregister`**
--   **Function:** Removes a previously registered node from your monitoring list.
--   **Usage:** `/unregister <the_address_to_remove>`
--   **Example:** `/unregister 0x123abcde...fghij`
-
-**`/list`**
--   **Function:** Shows a complete list of all the node addresses you are currently monitoring.
--   **Usage:** `/list`
-
-### **3. Manual Monitoring**
-
-These commands provide on-demand reports for your nodes.
-
-**`/stats`**
--   **Function:** Generates a detailed statistics report card. This includes total points, success rates, and performance changes over the last 1 and 24 hours.
--   **Usage:**
-    -   `/stats` - To get reports for all your registered nodes.
-    -   `/stats <address>` - To get a report for one specific node.
-
-**`/health`**
--   **Function:** Provides a real-time health check of a node, including its status (Active/Inactive), balance, and a health bar representing its most recent transactions.
--   **Usage:**
-    -   `/health` - To check all your registered nodes.
-    -   `/health <address>` - To check one specific node.
-
-### **4. Live Stats Automation**
-
-This feature provides a "live" dashboard that updates automatically in your chat.
-
-**`/autoupdate`**
--   **Function:** Starts a live stats report. The bot will send an initial report card and then automatically edit that same message with fresh data at the interval you specify.
--   **Usage:** `/autoupdate <interval_in_seconds>`
--   **Example:** `/autoupdate 300` (This will update the report every 5 minutes).
--   **Note:** The minimum interval is 60 seconds. Starting a new `/autoupdate` job will automatically stop and clean up the previous one.
-
-**`/stop`**
--   **Function:** Stops the live-updating stats report that was started by `/autoupdate`.
--   **Usage:** `/stop`
-
-### **5. Automatic Transaction Alerts**
-
-This system monitors your nodes in the background and alerts you proactively if something goes wrong.
-
-**`/auto`**
--   **Function:** Turns **ON** the automatic alert system. The bot will monitor your nodes 24/7 and send you an immediate notification if a recent transaction fails.
--   **Usage:** `/auto`
-
-**`/off`**
--   **Function:** Turns **OFF** the automatic alert system. You will no longer receive proactive alerts for failed transactions.
--   **Usage:** `/off`
+Distributed under the MIT License. See `LICENSE` for more information.
